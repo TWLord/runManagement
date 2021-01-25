@@ -1,0 +1,135 @@
+
+3-200 - ~ good match with 2017-02-6 beam settings, slight excess in low E tail
+
+--- 3-200 ---
+- v1 & v2 -
+d1_scale_factor = 1.005*0.999973,
+d2_scale_factor = 1.005*0.999979,
+ds_scale_factor = 1.0*0.99999,
+"d_1":-0.786362*d1_scale_factor,
+"d_2":-0.400071*d2_scale_factor,
+"d_s":2.26369344828*ds_scale_factor,
+
+- v3 - extra 0.2% on d2
+d1_scale_factor = 1.005*0.999973
+d2_scale_factor = 1.005*0.999979*1.002 # - extra + 0.2%
+ds_scale_factor = 1.0*0.99999
+"d_1":-0.786362*d1_scale_factor,
+"d_2":-0.400071*d2_scale_factor,
+"d_s":2.26369344828*ds_scale_factor,
+
+- v4 - looks okay, but still a bit of low P tail
+d1_scale_factor = 1.005*0.999973*1.001 # extra +0.1%,
+d2_scale_factor = 1.005*0.999979*1.002 # - extra + 0.2%
+ds_scale_factor = 1.0*0.99999
+
+- v5 - small difference.. up to +1% d1
+d1_scale_factor = 1.005*0.999973*1.01 # extra +1% see how it looks - might be too much
+d2_scale_factor = 1.005*0.999979*1.002 # - extra + 0.2%
+ds_scale_factor = 1.0*0.99999 
+
+- v6 - +1% on D1 too much, try v4: +0.1% D1, +0.2% D2, +2% DS 
+d1_scale_factor = 1.005*0.999973*1.001 # +0.1%
+d2_scale_factor = 1.005*0.999979*1.002 # +0.2%
+ds_scale_factor = 1.0*0.99999*1.02 # +2%
+
+--- x ---
+
+
+6-200 
+v1 slightly too low MC mom
+v2 very low
+v3
+
+--- 6-200 ---
+- v1 - conversion factor +5% + some%
+d1_scale_factor = 1.005*0.999973
+d2_scale_factor = 1.005*0.999979
+ds_scale_factor = 1.0*0.99999
+"d_1":-0.862115*d1_scale_factor, # + ~5%
+"d_2":-0.412951*d2_scale_factor, # + ~2%
+"d_s":2.39988445402*ds_scale_factor,
+
+- v2 - conversion factor +5%
+d1_scale_factor = 1.005*0.999973
+d2_scale_factor = 1.005*0.999979
+ds_scale_factor = 1.0*0.99999
+"d_1":-0.8225086*d1_scale_factor,
+"d_2":-0.4058597*d2_scale_factor,
+"d_s":2.39988445402*ds_scale_factor,
+
+- v3 - conversion factor +5% +~% +1%
+d1_scale_factor = 1.005*0.999973*1.01 
+d2_scale_factor = 1.005*0.999979*1.01
+ds_scale_factor = 1.0*0.99999
+"d_1":-0.862115*d1_scale_factor, # + ~5%
+"d_2":-0.412951*d2_scale_factor, # + ~2%
+"d_s":2.39988445402*ds_scale_factor,
+
+- v4 - needs to more oomph = up to +~4%
+d1_scale_factor = 1.005*0.999973*1.04
+d2_scale_factor = 1.005*0.999979*1.04
+ds_scale_factor = 1.0*0.99999
+
+- v5 - too much - bring it down to +3%
+d1_scale_factor = 1.005*0.999973*1.03
+d2_scale_factor = 1.005*0.999979*1.03
+ds_scale_factor = 1.0*0.99999
+
+- v6 - Trying +2% - See if too high or too low
+d1_scale_factor = 1.005*0.999973*1.02
+d2_scale_factor = 1.005*0.999979*1.02
+ds_scale_factor = 1.0*0.99999     
+
+
+--- x ---
+
+
+10-200
+v1 slightly too low MC mom
+v2 very low
+v3
+
+--- 10-200 ---
+- v1 - conversion factor +5% +~some%
+d1_scale_factor = 1.005*0.999973
+d2_scale_factor = 1.005*0.999979
+ds_scale_factor = 1.0*0.99999
+"d_1":-0.908808*d1_scale_factor, # +~5%
+"d_2":-0.454908*d2_scale_factor, # +~2%
+"d_s":2.61302588506*ds_scale_factor,
+
+- v2 - conversion factor +5%
+d1_scale_factor = 1.005*0.999973
+d2_scale_factor = 1.005*0.999979
+ds_scale_factor = 1.0*0.99999
+"d_1":-0.86751420016*d1_scale_factor,
+"d_2":-0.44735676722*d2_scale_factor,
+"d_s":2.61317935057*ds_scale_factor,
+
+- v3 - conversion factor +5% +~some% +1%
+d1_scale_factor = 1.005*0.999973*1.01
+d2_scale_factor = 1.005*0.999979*1.01
+ds_scale_factor = 1.0*0.99999
+"d_1":-0.862115*d1_scale_factor, # +~5%
+"d_2":-0.412951*d2_scale_factor, # +~2%
+"d_s":2.39988445402*ds_scale_factor,
+
+- v4 -  slightly more oomph - up to +2% - might be too much
+d1_scale_factor = 1.005*0.999973*1.02
+d2_scale_factor = 1.005*0.999979*1.02
+ds_scale_factor = 1.0*0.99999
+
+- v5 - too much, bring it down to +1.5%
+d1_scale_factor = 1.005*0.999973*1.015
+d2_scale_factor = 1.005*0.999979*1.015
+ds_scale_factor = 1.0*0.99999
+
+- v6 - try v3 with +2% DS
+d1_scale_factor = 1.005*0.999973*1.01
+d2_scale_factor = 1.005*0.999979*1.01
+ds_scale_factor = 1.0*0.99999*1.02   
+
+--- x ---
+
+
