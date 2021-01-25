@@ -33,7 +33,9 @@ if [ ! -e $GeomDir/runnumber_${runnumber}/ ] ; then
 #bsub -G micegrp " 
 echo -en "#!/bin/bash \n\
 #SBATCH --ntasks=1
-#SBATCH --mem-per-cpu=2012
+#SBATCH --mem-per-cpu=3997 \n\
+#SBATCH --partition epp \n\
+ #####SBATCH --mem-per-cpu=2012
 
 cd $MICEvers \n\
 . env.sh \n\

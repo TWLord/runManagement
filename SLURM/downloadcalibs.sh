@@ -25,9 +25,9 @@ mkdir -p $CalibDir/files/cabling/${runnumber}/
 #sbatch -o $here/logs/calib${rn}.sh " 
 echo -en "#!/bin/bash \n\
 #SBATCH --ntasks=1 \n\
+#SBATCH --mem-per-cpu=3997 \n\
 #SBATCH --partition epp \n\
 module purge 
- ####SBATCH --mem-per-cpu=2012 \n\
 
 
 cd $MAUSDIR \n\
