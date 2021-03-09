@@ -1,0 +1,18 @@
+
+genericquad QuadTypeIV fieldLength=888 apertureRadius=101.5 ironRadius=381 \
+        ironLength=914 ironColor=0,.6,0 kill=1 fieldMaterial=Air
+
+place QuadTypeIV rename=Q1 gradient=1.0 z=3000 y=0 
+
+beam gaussian particle=mu+ nEvents=1000 beamZ=0.0 \
+sigmaX=10.0 sigmaY=10.0 sigmaXp=0.100 sigmaYp=0.100 
+
+fieldntuple category=NTuples format=ascii filename=Q1_field.txt z=0,2000,1 exit
+printf zloop=0,4000,20 "%.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.0f" x y z Px Py Pz Bx By Bz PDGid filename=Q1_field2.txt coordinates=centerline
+
+
+
+
+
+
+

@@ -1,0 +1,100 @@
+
+param -unset d_2=0.421 d_s=0
+
+
+param -unset proton_number=1E9
+
+param -unset proton_weight=1
+
+param -unset protonabsorberin=1
+param -unset proton_absorber_thickness=29
+
+param -unset WRKDIR=/home/phswbb/maus/src/map/MapPyBeamlineSimulation/G4bl/
+param -unset g4bl_output_file_name=/home/phswbb/maus/descope/descope_g4bl_output.txt
+param -unset particle_charge=3
+
+param random_seed=5
+
+*       MAY09-B1B2-positives.in
+*
+*       B1 and B2 only.
+#
+#       Command-line parameter REQUIRED: P  (target meanMomentum)
+#       Command-line parameters (optional - default as follows):
+param -unset first=0 last=4000 viewer=none
+
+# piMomentumRef is the pion referenceKinCut momentum at target
+# muMomentumRef is the muon reference momentum at center of DecaySolenoid
+# if they are equal, no mu reference is generated, so pi is tuned to the end.
+param -unset Ppi=480 Pmu=238
+param piMomentumRef=$Ppi muMomentumRef=$Pmu
+
+# B1Type, B2Type: 0=genericbend, 1=6" field map, 2=6"field map tapered
+#                 3=6"field map tapered, offset position (B1 only)
+param -unset B1Type=2 B2Type=2
+param -unset CollimatorHalfAperture=236
+param -unset DiffThick=3
+
+param -unset piplus=1 piminus=0 eplus=1 eminus=0 proton=1 gamma=1
+param -unset keep='' C='+'
+
+
+
+
+# include default_values
+include $WRKDIR/defaults/default_values.in
+
+# HistoScope filename from first event #
+param histoFile=$first.root histoUpdate=1000000000 FIRST=$first
+
+physics QGSP_BIC doStochastics=$STOCHASTICS
+trackcuts keep=$keep kineticEnergyCut=5 maxTime=10000000000000
+if "($C 1)==+1"
+	particlecolor proton=1,0,0 pi+=0,1,0 mu+=0,0,1 plus=1,0,1 minus=1,1,0 \
+        	neutral=0,1,1 reference=1,1,1
+else
+	particlecolor proton=1,0,0 pi-=0,1,0 mu-=0,0,1 plus=1,0,1 minus=1,1,0 \
+        	neutral=0,1,1 reference=1,1,1
+endif
+
+
+# include Materials
+include $WRKDIR/defaults/materials.in
+
+# The MICE magnets
+include $WRKDIR/defaults/magnets.in
+
+# Others (FC, absorber, ...)
+# include $WRKDIR/defaults/others.in
+
+# The Beamline Vacuum Components
+include $WRKDIR/defaults/vacuum.in
+
+# The PID detectors
+include $WRKDIR/defaults/pid.in
+
+
+
+beam gaussian particle=mu+ nEvents=1000 beamZ=0.0 \
+sigmaX=10.0 sigmaY=10.0 sigmaXp=0.100 sigmaYp=0.100 
+
+
+## place BendTypeI6inIron rename=B2 z=1000.0 x=0 By=0 fieldMaterial=Air
+## place TypeI6inTaperedField z=1000.0 x=0 current=$d_2
+
+
+genericbend B2 fieldMaterial=Air kill=0 maxStep=1  By=$d_2 \
+	    fieldWidth=153 fieldHeight=500 fieldLength=200 \
+	    ironWidth=200 ironHeight=800 ironLength=0 \
+	    fringeFactor=1 fringe=-31.9011,13.0675,0.0676594,-0.332145,-0.0442494,0.0120776
+   
+place B2 z=1000.0 x=0 		
+
+
+fieldntuple category=NTuples format=ascii filename=newD2_field.txt z=0,2000,1 exit
+
+
+#printf zloop=0,2000,20 "%.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.3f %.0f" x y z Px Py Pz Bx By Bz PDGid filename=D1_field.txt coordinates=centerline
+
+
+

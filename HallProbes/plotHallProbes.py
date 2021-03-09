@@ -291,7 +291,8 @@ def runPlotter(Args, run = None):
 if __name__ == "__main__":
 
   runwithArgs = False
-  rf = "/home/phumhf/MICE/runManagement/sortedsolenoidbyCC/sorted-solenoid2017-02-6/sorted263*ABS*solenoid2017-02-6.txt"
+  #rf = "/home/phumhf/MICE/runManagement/sortedsolenoidbyCC/sorted-solenoid2017-02-6/sorted263*ABS*solenoid2017-02-6.txt"
+  rf = "/home/phumhf/MICE/runManagement/sortedsolenoidbyCC/sorted-solenoid2017-02-6/sorted264*ABS*6-140*solenoid2017-02-6.txt"
   runFile = [str(i) for i in glob.glob(rf)]
   inF = "/data/mice/phumhf/HallProbes/2017_0*/*:B"
   #inFile = glob.glob(inF)
