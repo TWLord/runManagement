@@ -11,6 +11,8 @@ import numpy as np
 import numpy.ma as ma
 import glob
 
+four_panels = False
+
 plot_dict = {}
 
 def pullArgs(runFiles, magnetList, dest = None, out = None) :
@@ -96,6 +98,12 @@ def clearLists(ManyArgs):
      for run in ManyArgs.keys():
          ManyArgs[run]["xLists"] = {}
          ManyArgs[run]["yLists"] = {}
+
+def get_magnet_name(magnet):
+    mtmp = magnet.split('-')
+    hpnum = mtmp[3].split(':')[0]
+    magnetname = "HP-"+hpnum 
+    return magnetname
 
 
 def CheckAllinFiles(runFiles, inDirs, ManyArgs, magnet):
@@ -299,6 +307,137 @@ def runPlotter(ManyArgs, magnet, collatedDict):
         plot_setup2(fig, SSU, SSD, legendU, legendD, "SSU Field Residual Over Runs", "SSD Field Residual Over Runs", outname) 
         plot_setup2(figR, SSUR, SSDR, legendUR, legendDR, "SSU Field Residual Over Runs", "SSD Field Residual Over Runs", outname+'_runs') 
 
+
+def runPlotter_twopanels(ManyArgs, magnet, collatedDict):
+
+    magnetList = []
+    if type(magnet) == list:
+        magnetList = magnet
+    else:
+        magnetList.append(magnet)
+
+
+    fig, (SSU, SSD) = plt.subplots(1, 2)
+    fig.set_figheight(4.8)
+    fig.set_figwidth(10.8)
+    SSU.xaxis.set_major_locator(plt.MaxNLocator(4))
+    SSD.xaxis.set_major_locator(plt.MaxNLocator(4))
+    SSU.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
+    SSD.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
+
+    figR, (SSUR, SSDR) = plt.subplots(1, 2)
+    figR.set_figheight(4.8)
+    figR.set_figwidth(10.8)
+    for plot in [SSUR, SSDR]:
+        plot.set_xlabel('Run Number')
+        plot.set_ylabel('Hall Probe Deviation From Mean (T)')
+
+    figA = plot_dict["all"]['figure']
+    SSUA = plot_dict["all"]['plot_one']
+    SSDA = plot_dict["all"]['plot_two']
+
+    outname = ManyArgs[ManyArgs.keys()[-1]]["output"]
+    CC = ManyArgs[ManyArgs.keys()[-1]]["CC"]
+
+    runlist = sorted([int(run) for run in ManyArgs.keys()])
+    runlist = [str(run) for run in runlist]
+
+    plots_ok = False
+    for magnet in magnetList:
+        print "-Plotting runs for magnet:", magnet
+        magnetname = get_magnet_name(magnet)
+        # Set up per magnet plots
+        fig2, SSM = plt.subplots(1, 1)
+        fig2.set_figheight(4.8)
+        fig2.set_figwidth(10.8)
+        SSM.xaxis.set_major_locator(plt.MaxNLocator(7))
+        SSM.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
+
+        # Set up run x axis plot 
+        fig3, SSR = plt.subplots(1, 1)
+        fig3.set_figheight(4.8)
+        fig3.set_figwidth(10.8)
+        #SSR.xaxis.set_major_locator(plt.MaxNLocator(4))
+        #SSR.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
+
+
+        meanFieldStr = str(round(collatedDict[magnet]["meanField"],5))
+        x = []
+        runx = []
+        field = []
+        mask_points = []
+        #for run in ManyArgs.keys(): 
+        for run in runlist:
+            #print "-- Plotting run", run
+            #x = ManyArgs[run]["xLists"][magnet]
+            #field = [f - collatedDict[magnet]["meanField"] for f in ManyArgs[run]["yLists"][magnet]]
+            # Unconverted datetime variable
+            x += ManyArgs[run]["xLists"][magnet]
+            xlist = ManyArgs[run]["xLists"][magnet]
+            runx += [int(run) + float(i)/len(xlist) for i in range(len(xlist))]
+            #print "Run x-vals:"
+            #print runx
+            # Converted datetime
+            #x += [matplotlib.dates.date2num(x) for x in ManyArgs[run]["xLists"][magnet]]
+            field += [f - collatedDict[magnet]["meanField"] for f in ManyArgs[run]["yLists"][magnet]]
+        if len(x):
+            # Setup masked array to do linebreaks between runs
+            xarr = ma.array(x)
+
+            SSM.plot(xarr, field, label = magnetname+", mean field "+meanFieldStr+' T', linestyle='None', marker='o', alpha=0.5)
+            plot_setup_twopanels(fig2, SSM, magnet+" Residual Over Runs", outname+magnet) #, magnet+", mean field "+meanFieldStr)
+            SSR.plot(runx, field, label = magnetname+", mean field "+meanFieldStr+' T', linestyle='None', marker='o', alpha=0.5)
+            plot_setup_twopanels(fig3, SSR, magnet+" Residual Over Runs", outname+magnet+'_runs') #, magnet+", mean field "+meanFieldStr)
+            if "SSU" in magnet : 
+              #SSU.plot(xarr, field, label = magnet+", mean field "+meanFieldStr)
+              #SSU.plot(x, field, label = magnet+", mean field "+meanFieldStr)
+              SSU.plot(x, field, label = magnetname+", mean field "+meanFieldStr+' T', linestyle='None', marker='x', alpha=0.5)
+              SSUR.plot(runx, field, label = magnetname+", mean field "+meanFieldStr+' T', linestyle='None', marker='x', alpha=0.5)
+              SSUA.plot(runx, field, label = magnetname+", "+CC+", mean field "+meanFieldStr+' T', linestyle='None', marker='x', alpha=0.5)
+              print magnet
+            if "SSD" in magnet: 
+              #SSD.plot(xarr, field, label = magnet+", mean field "+meanFieldStr)
+              SSD.plot(xarr, field, label = magnetname+", mean field "+meanFieldStr+' T', linestyle='None', marker='x', alpha=0.5)
+              SSDR.plot(runx, field, label = magnetname+", mean field "+meanFieldStr+' T', linestyle='None', marker='x', alpha=0.5)
+              SSDA.plot(runx, field, label = magnetname+", "+CC+", mean field "+meanFieldStr+' T', linestyle='None', marker='x', alpha=0.5)
+              print magnet
+            plots_ok = True
+            
+    if plots_ok:
+        plot_setup2_twopanels(fig, SSU, SSD, "SSU Field Residual Over Runs", "SSD Field Residual Over Runs", outname) 
+        plot_setup2_twopanels(figR, SSUR, SSDR, "SSU Field Residual Over Runs", "SSD Field Residual Over Runs", outname+'_runs') 
+
+
+def plot_setup2_twopanels(figure, plot_one, plot_two, title_one, title_two, filename):
+        plot_one.set_title(title_one)
+        plot_two.set_title(title_two)
+        #hU,lU = plot_one.get_legend_handles_labels()
+        #hD,lD = plot_two.get_legend_handles_labels()
+        #l1 = plot_one.legend(hU,lU, bbox_to_anchor=(0.0,1.02), loc="upper right", borderaxespad=0)
+        #l2 = plot_two.legend(hD,lD, bbox_to_anchor=(1.0,1.02), loc="upper right", borderaxespad=0)
+        #legend_one.axis("off")
+        #legend_two.axis("off")
+        plot_one.legend()
+        plot_two.legend()
+        plt.tight_layout()
+        figure.savefig(filename+".png", bbox_inches='tight' )
+        #figure.savefig(filename+".png", bbox_extra_artists=(l1,l2), bbox_inches='tight' )
+        plt.close(figure)
+
+
+def plot_setup_twopanels(figure, aplot, title, filename):
+    filename = filename.replace(":","-")
+    aplot.set_title(title)
+    #hU,lU = aplot.get_legend_handles_labels()
+    #l1 = aplot.legend(hU,lU, bbox_to_anchor=(0.0,1.02), loc="upper right", borderaxespad=0)
+    #alegend.axis("off")
+    aplot.legend()
+    plt.tight_layout()
+    plt.show()
+    figure.savefig(filename+".png", bbox_inches='tight' )
+    #figure.savefig(filename+".png", bbox_extra_artists=(l1,), bbox_inches='tight' )
+    plt.close(figure)
+
 def plot_setup2(figure, plot_one, plot_two, legend_one, legend_two, title_one, title_two, filename):
         plot_one.set_title(title_one)
         plot_two.set_title(title_two)
@@ -327,27 +466,46 @@ def plot_setup(figure, aplot, alegend, title, filename):
 
 def init_mother_plot():
 
-    fig, (legendU, SSU, SSD, legendD) = plt.subplots(1, 4, gridspec_kw={"width_ratios":[1,4,4,1]})
-    fig.set_figheight(4.8)
-    fig.set_figwidth(12.8)
+    if four_panels:
+        fig, (legendU, SSU, SSD, legendD) = plt.subplots(1, 4, gridspec_kw={"width_ratios":[1,4,4,1]})
+        fig.set_figheight(4.8)
+        fig.set_figwidth(12.8)
 
-    for plot in [SSU, SSD]:
-        plot.set_xlabel('Run Number')
-        plot.set_ylabel('Hall Probe Deviation From Mean (T)')
+        for plot in [SSU, SSD]:
+            plot.set_xlabel('Run Number')
+            plot.set_ylabel('Hall Probe Deviation From Mean (T)')
 
 
-    plot_dict["all"] = {'figure':fig,
-                        'legend_one':legendU,
-                        'legend_two':legendD,
-                        'plot_one':SSU,
-                        'plot_two':SSD,
-                       }
+        plot_dict["all"] = {'figure':fig,
+                            'legend_one':legendU,
+                            'legend_two':legendD,
+                            'plot_one':SSU,
+                            'plot_two':SSD,
+                           }
+    else:
+        fig, (SSU, SSD) = plt.subplots(1, 2)
+        fig.set_figheight(4.8)
+        fig.set_figwidth(10.8)
+
+        for plot in [SSU, SSD]:
+            plot.set_xlabel('Run Number')
+            plot.set_ylabel('Hall Probe Deviation From Mean (T)')
+
+
+        plot_dict["all"] = {'figure':fig,
+                            'plot_one':SSU,
+                            'plot_two':SSD,
+                           }
 
 if __name__ == "__main__":
 
     plot_settings = []
 
-    inDirLoc = "/data/mice/phumhf/HallProbes/20*/"
+    #inDirLoc = "/storage/epp2/mice/phumhf/HallProbes/2017_02/"
+    inDirLoc = "/storage/epp2/mice/phumhf/HallProbes/2017_*/"
+    #inDirLoc = "/storage/epp2/mice/phumhf/HallProbes/20*/"
+
+    #inDirLoc = "/data/mice/phumhf/HallProbes/20*/"
     #inDirLoc = "/data/mice/phumhf/HallProbes/2017_*/"
     """for direc in glob.glob(inDirLoc):
         #print direc
@@ -369,11 +527,12 @@ if __name__ == "__main__":
     # 2016-05-1-SSUSSD - short usage, no probe data
 
     # The OK ones.. - still testing 2016-04-2.4a onwards
-    CClist = ["2017-02-6", "2017-02-5", "2017-02-2", "2016-04-2.4a", "2016-04-1.7", "2016-04-1.5", "2016-04-1.2", "M2D-flip-2017-02-5"]
-    #CClist = ["2017-02-6",]
+    #CClist = ["2017-02-6", "2017-02-5", "2017-02-2", "2016-04-2.4a", "2016-04-1.7", "2016-04-1.5", "2016-04-1.2", "M2D-flip-2017-02-5"]
+    CClist = ["2017-02-6",]
     for CC in CClist: 
         plot_settings.append({"dest":os.path.join("allCycles/",CC),
-                              "rf":"/home/phumhf/MICE/runManagement/cleanedsolenoidbyCC/sorted-solenoid"+CC+".txt",
+                              #"rf":"/home/phumhf/MICE/runManagement/cleanedsolenoidbyCC/sorted-solenoid"+CC+".txt",
+                              "rf":"/storage/epp2/phumhf/MICE/runManagement/cleanedsolenoidbyCC/sorted-solenoid"+CC+".txt",
                               "inD":inDirLoc})
 
 
@@ -395,7 +554,8 @@ if __name__ == "__main__":
       
 
         #magnetListFile = "/home/phumhf/MICE/runManagement/HallProbes/Hall_probes.txt"
-        magnetListFile = "/home/phumhf/MICE/runManagement/HallProbes/Hall_probes_edit.txt"
+        #magnetListFile = "/home/phumhf/MICE/runManagement/HallProbes/Hall_probes_edit.txt"
+        magnetListFile = "/storage/epp2/phumhf/MICE/runManagement/HallProbes/Hall_probes_edit.txt"
         mf = open(magnetListFile, 'r')
         magnetList = [] 
         for line in mf:
@@ -426,9 +586,15 @@ if __name__ == "__main__":
             CheckAllinFiles(runFiles, inDirs, ManyArgs, magnet)
             collateData(ManyArgs, magnet, collatedDict, foundMagnets)
             #runPlotter(ManyArgs, magnet)
-        runPlotter(ManyArgs, foundMagnets, collatedDict)
+        if four_panels:
+            runPlotter(ManyArgs, foundMagnets, collatedDict)
+        else:
+            runPlotter_twopanels(ManyArgs, foundMagnets, collatedDict)
         #runPlotter(ManyArgs, magnetList, collatedDict)
             #clearLists(ManyArgs)
 
     All = plot_dict['all']
-    plot_setup2(All['figure'], All['plot_one'], All['plot_two'], All['legend_one'], All['legend_two'], "SSU Field Residual Over Runs", "SSD Field Residual Over Runs", 'allCycles/'+out+'_all')
+    if four_panels:
+        plot_setup2(All['figure'], All['plot_one'], All['plot_two'], All['legend_one'], All['legend_two'], "SSU Field Residual Over Runs", "SSD Field Residual Over Runs", 'allCycles/'+out+'_all')
+    else:
+        plot_setup2_twopanels(All['figure'], All['plot_one'], All['plot_two'], "SSU Field Residual Over Runs", "SSD Field Residual Over Runs", 'allCycles/'+out+'_all')
